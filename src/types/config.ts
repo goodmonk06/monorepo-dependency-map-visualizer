@@ -1,53 +1,33 @@
-export interface BoundaryRule {
-  /**
-   * Name of the rule for reporting
-   */
-  name: string;
+import { z } from 'zod';
 
-  /**
-   * Pattern to match source packages (e.g., "apps/*")
-   */
-  from: string;
+/**
+ * Zod schema for boundary rule validation
+ */
+export const BoundaryRuleSchema = z.object({
+  name: z.string().min(1, 'Boundary rule name cannot be empty'),
+  from: z.string().min(1, 'Boundary rule "from" pattern cannot be empty'),
+  to: z.string().min(1, 'Boundary rule "to" pattern cannot be empty'),
+  message: z.string().optional(),
+});
 
-  /**
-   * Pattern to match target packages that are forbidden (e.g., "packages/internal/*")
-   */
-  to: string;
+/**
+ * Zod schema for monorepo map configuration
+ */
+export const MonorepoMapConfigSchema = z.object({
+  rootPatterns: z
+    .array(z.string().min(1))
+    .min(1, 'At least one root pattern is required'),
+  boundaryRules: z.array(BoundaryRuleSchema).optional().default([]),
+  detectCycles: z.boolean().optional().default(true),
+  exclude: z.array(z.string()).optional().default(['node_modules', 'dist', 'build', '.next']),
+  rootDir: z.string().optional(),
+});
 
-  /**
-   * Error message to display when this rule is violated
-   */
-  message?: string;
-}
-
-export interface MonorepoMapConfig {
-  /**
-   * Glob patterns to find package.json files in the monorepo
-   * Default: ["packages/*", "apps/*"]
-   */
-  rootPatterns: string[];
-
-  /**
-   * Rules defining forbidden dependencies between packages
-   */
-  boundaryRules?: BoundaryRule[];
-
-  /**
-   * Whether to detect circular dependencies
-   * Default: true
-   */
-  detectCycles?: boolean;
-
-  /**
-   * Patterns to exclude from analysis
-   */
-  exclude?: string[];
-
-  /**
-   * Root directory of the monorepo (defaults to config file location)
-   */
-  rootDir?: string;
-}
+/**
+ * TypeScript types derived from zod schemas
+ */
+export type BoundaryRule = z.infer<typeof BoundaryRuleSchema>;
+export type MonorepoMapConfig = z.infer<typeof MonorepoMapConfigSchema>;
 
 export const defaultConfig: MonorepoMapConfig = {
   rootPatterns: ['packages/*', 'apps/*'],

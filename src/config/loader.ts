@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { MonorepoMapConfig, defaultConfig } from '../types/config';
+import { MonorepoMapConfig, defaultConfig, MonorepoMapConfigSchema } from '../types/config';
+import { ZodError } from 'zod';
 
 export function loadConfig(configPath?: string): MonorepoMapConfig {
   const defaultConfigPath = 'monorepo-map.config.json';
@@ -16,36 +17,48 @@ export function loadConfig(configPath?: string): MonorepoMapConfig {
 
   try {
     const configContent = fs.readFileSync(finalPath, 'utf-8');
-    const userConfig = JSON.parse(configContent) as Partial<MonorepoMapConfig>;
+    const userConfig = JSON.parse(configContent);
 
     // Merge with defaults
-    const config: MonorepoMapConfig = {
+    const mergedConfig = {
       ...defaultConfig,
       ...userConfig,
       boundaryRules: userConfig.boundaryRules || defaultConfig.boundaryRules,
     };
 
+    // Validate using zod schema
+    const validatedConfig = MonorepoMapConfigSchema.parse(mergedConfig);
+
     // Set root directory to config file location if not specified
-    if (!config.rootDir) {
-      config.rootDir = path.dirname(path.resolve(finalPath));
+    if (!validatedConfig.rootDir) {
+      validatedConfig.rootDir = path.dirname(path.resolve(finalPath));
     }
 
-    return config;
+    return validatedConfig;
   } catch (error) {
+    if (error instanceof ZodError) {
+      const formattedErrors = error.issues.map((err: any) =>
+        `  - ${err.path.join('.')}: ${err.message}`
+      ).join('\n');
+      throw new Error(`Config validation failed:\n${formattedErrors}`);
+    }
+    if (error instanceof SyntaxError) {
+      throw new Error(`Invalid JSON in config file: ${error.message}`);
+    }
     throw new Error(`Failed to load config: ${error}`);
   }
 }
 
 export function validateConfig(config: MonorepoMapConfig): void {
-  if (!config.rootPatterns || config.rootPatterns.length === 0) {
-    throw new Error('Config must specify at least one rootPattern');
-  }
-
-  if (config.boundaryRules) {
-    for (const rule of config.boundaryRules) {
-      if (!rule.name || !rule.from || !rule.to) {
-        throw new Error('Boundary rules must have name, from, and to properties');
-      }
+  try {
+    MonorepoMapConfigSchema.parse(config);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const formattedErrors = error.issues.map((err: any) =>
+        `  - ${err.path.join('.')}: ${err.message}`
+      ).join('\n');
+      throw new Error(`Config validation failed:\n${formattedErrors}`);
     }
+    throw error;
   }
 }

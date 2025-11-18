@@ -10,7 +10,17 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/cli.js",
-    "test": "jest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "lint": "echo 'No linting configured yet'",
+    "clean": "rm -rf dist",
+    "analyze": "node dist/cli.js analyze",
+    "ui:dev": "cd ui && npm run dev",
+    "ui:build": "cd ui && npm run build",
+    "ui:install": "cd ui && npm install",
+    "setup": "npm install && npm run build && npm run ui:install"
   },
   "keywords": [
     "monorepo",
@@ -25,12 +35,15 @@
     "@typescript-eslint/parser": "^6.0.0",
     "commander": "^11.0.0",
     "glob": "^10.3.0",
-    "graphlib": "^2.1.8"
+    "graphlib": "^2.1.8",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
     "@types/graphlib": "^2.1.12",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "@vitest/ui": "^4.0.10",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.10"
   }
 }

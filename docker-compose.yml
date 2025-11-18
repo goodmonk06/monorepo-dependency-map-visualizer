@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Monorepo analyzer CLI
+  analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount the target monorepo you want to analyze
+      - ./example:/workspace
+      # Mount output directory
+      - ./analysis:/workspace/analysis
+    working_dir: /workspace
+    command: analyze
+    environment:
+      - NODE_ENV=production
+
+  # UI for visualization
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount analysis output so UI can read it
+      - ./analysis:/app/public/analysis:ro
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - analyzer
+
+  # Development UI (with hot reload)
+  ui-dev:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./ui:/app
+      - ./analysis:/app/public/analysis:ro
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npm run dev"
+    environment:
+      - NODE_ENV=development
+    profiles:
+      - dev

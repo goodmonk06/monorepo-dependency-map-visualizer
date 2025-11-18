@@ -16,5 +16,5 @@
     "moduleResolution": "node"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "ui"]
+  "exclude": ["node_modules", "dist", "ui", "**/*.test.ts", "**/*.spec.ts", "**/__tests__"]
 }

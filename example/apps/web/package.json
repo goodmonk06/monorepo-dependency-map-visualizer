@@ -1,0 +1,8 @@
+{
+  "name": "@example/web",
+  "version": "1.0.0",
+  "dependencies": {
+    "@example/ui": "*",
+    "@example/api": "*"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "rootPatterns": [
+    "packages/*",
+    "apps/*"
+  ],
+  "detectCycles": true,
+  "boundaryRules": [
+    {
+      "name": "apps-cannot-depend-on-apps",
+      "from": "apps/*",
+      "to": "apps/*",
+      "message": "Applications should not depend on other applications"
+    },
+    {
+      "name": "no-internal-dependencies-from-public",
+      "from": "packages/public-*",
+      "to": "packages/internal-*",
+      "message": "Public packages cannot depend on internal packages"
+    },
+    {
+      "name": "ui-layer-separation",
+      "from": "packages/ui-*",
+      "to": "packages/api-*",
+      "message": "UI packages should not directly depend on API packages"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    "out",
+    "coverage"
+  ]
+}

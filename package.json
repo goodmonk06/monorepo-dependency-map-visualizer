@@ -1,0 +1,36 @@
+{
+  "name": "monomap",
+  "version": "1.0.0",
+  "description": "Monorepo dependency visualizer for Turborepo and JS/TS monorepos",
+  "main": "dist/index.js",
+  "bin": {
+    "monomap": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "monorepo",
+    "dependency",
+    "visualizer",
+    "turborepo",
+    "analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@typescript-eslint/parser": "^6.0.0",
+    "commander": "^11.0.0",
+    "glob": "^10.3.0",
+    "graphlib": "^2.1.8"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/graphlib": "^2.1.12",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

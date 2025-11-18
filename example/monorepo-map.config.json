@@ -1,0 +1,19 @@
+{
+  "rootPatterns": [
+    "packages/*",
+    "apps/*"
+  ],
+  "detectCycles": true,
+  "boundaryRules": [
+    {
+      "name": "apps-cannot-depend-on-apps",
+      "from": "apps/*",
+      "to": "apps/*",
+      "message": "Applications should not depend on other applications - this creates tight coupling"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
